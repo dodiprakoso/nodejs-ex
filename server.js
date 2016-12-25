@@ -7,6 +7,15 @@ var express = require('express'),
 
 var server = require('http').Server(app);
 var config = require('./config');
+const redis =   require('redis');
+const io =      require('socket.io').listen(server);
+const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.redislabs.com',{});
+
+client.auth("silahkanmasuk123"); 
+
+
+
+
     
 Object.assign=require('object-assign')
 
