@@ -1,108 +1,132 @@
-//  OpenShift sample Node application
-var express = require('express'),
-    fs      = require('fs'),
-    app     = express(),
-    eps     = require('ejs'),
-    redis   = require('redis'),
-    morgan  = require('morgan');
-    
-Object.assign=require('object-assign')
+// Express.js stuff
+var express = require('express');
+var app = require('express')();
+var server = require('http').Server(app);
 
-app.engine('html', require('ejs').renderFile);
-app.use(morgan('combined'))
+// Websockets with socket.io
 
-var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-    mongoURLLabel = "";
+var config = require('./config');
 
-if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
-  var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
-      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
-      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
-      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
-      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
-      mongoUser = process.env[mongoServiceName + '_USER'];
+const redis =   require('redis');
+const io =      require('socket.io').listen(server);
+const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.redislabs.com',{});
 
-  if (mongoHost && mongoPort && mongoDatabase) {
-    mongoURLLabel = mongoURL = 'mongodb://';
-    if (mongoUser && mongoPassword) {
-      mongoURL += mongoUser + ':' + mongoPassword + '@';
-    }
-    // Provide UI label that excludes user id and pw
-    mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
-    mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
+client.auth("silahkanmasuk123"); 
 
-  }
-}
-var db = null,
-    dbDetails = new Object();
+server.listen(config.serverport,config.serverip,function() {
 
-var initDb = function(callback) {
-  if (mongoURL == null) return;
+  console.log("Server running @ http://" + config.serverip + ":" + config.serverport);
 
-  var mongodb = require('mongodb');
-  if (mongodb == null) return;
+});
 
-  mongodb.connect(mongoURL, function(err, conn) {
-    if (err) {
-      callback(err);
-      return;
-    }
+ // Allow some files to be server over HTTP
+app.use(express.static(__dirname + '/'));
 
-    db = conn;
-    dbDetails.databaseName = db.databaseName;
-    dbDetails.url = mongoURLLabel;
-    dbDetails.type = 'MongoDB';
-
-    console.log('Connected to MongoDB at: %s', mongoURL);
-  });
-};
-
+// Serve GET on http://domain/
 app.get('/', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    var col = db.collection('counts');
-    // Create a document with request IP and current time of request
-    col.insert({ip: req.ip, date: Date.now()});
-    col.count(function(err, count){
-      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
+  res.sendFile(__dirname + '/index.html');
+});
+
+// Server GET on http://domain/api/config
+// A hack to provide client the system config
+app.get('/api/config', function(req, res) {
+  res.send('var config = ' + JSON.stringify(config));
+}); 
+
+/**
+* On Connection
+*
+**/
+
+io.sockets.on('connection', function(client) {
+
+    client.emit("status", "Now, we are connected to server");
+
+    /**
+    * Create room for userr and conv
+    *
+    **/
+
+    client.on('subscribe', function(room) {
+        
+        console.log("isi client.rooms : ");
+        console.log(client.rooms);
+
+        // if(!client.rooms.indexOf(room) >= 0){
+            
+            console.log('joining room', room);
+            client.join(room);  
+
+        // }
+
     });
-  } else {
-    res.render('index.html', { pageCountMessage : null});
-  }
-});
 
-app.get('/pagecount', function (req, res) {
-  // try to initialize the db on every request if it's not already
-  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-  if (db) {
-    db.collection('counts').count(function(err, count ){
-      res.send('{ pageCount: ' + count + '}');
+    /**
+    * Message and conversation
+    *
+    **/
+
+    client.on('create message', function(data) {
+
+        console.log('create room post', data.data.id);
+        io.sockets.in(data.data.to.user.user_permalink).emit('new message', data.data);
+
     });
-  } else {
-    res.send('{ pageCount: -1 }');
-  }
+
+    client.on('subscribe conversations', function(room) {
+        console.log('joining room conv', room);
+        client.join(room);
+    });
+
+    client.on('send message', function(data) {
+        console.log('sending room post', data.room);
+        client.broadcast.to(data.room).emit('conversation private post', data.message);
+    });
+
+    client.on('remove message', function(data) {
+
+        client.broadcast.to(data.room).emit('conversation remove', data.data);
+
+        //remove the room
+        console.log('remove room post', data.room);
+        client.leave(data.room);
+
+    });
+
+    /**
+    * Redis server auth
+    *
+    **/
+    const redisClient = redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.redislabs.com',{});
+
+    redisClient.auth("silahkanmasuk123"); 
+
+    /**
+    * Subscribe to user.change
+    *
+    **/
+
+    redisClient.subscribe('user.change');
+
+    redisClient.on("message", function(channel, data) {
+
+        data = JSON.parse(data);
+
+        if(data.user){      
+
+            io.sockets.in(data.user.user_permalink).emit(channel, data);
+
+        }        
+
+    });
+
+    /**
+    * On current connection disconnect
+    *
+    **/
+
+    client.on('disconnect', function() { 
+        console.log('A user disconnected');
+        redisClient.quit();
+    });
 });
-
-// error handling
-app.use(function(err, req, res, next){
-  console.error(err.stack);
-  res.status(500).send('Something bad happened!');
-});
-
-initDb(function(err){
-  console.log('Error connecting to Mongo. Message:\n'+err);
-});
-
-app.listen(port, ip);
-console.log('Server running on http://%s:%s', ip, port);
-
-module.exports = app ;
