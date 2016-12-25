@@ -1,9 +1,10 @@
 //  OpenShift sample Node application
-var express = require('express'),
-    fs      = require('fs'),
-    app     = express(),
+var fs      = require('fs'),
     eps     = require('ejs'),
     morgan  = require('morgan');
+
+var app = require('express')();
+var server = require('http').Server(app);
 
 var config = require('./config');
 
