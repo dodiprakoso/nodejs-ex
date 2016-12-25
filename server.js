@@ -28,7 +28,7 @@ app.get('/', function (req, res) {
 
 server.listen(port,ip,function() {
 
-  console.log("Server running @ http://" + config.serverip + ":" + config.serverport);
+  console.log("Server running @ http://" + ip + ":" + port);
 
 });
 
