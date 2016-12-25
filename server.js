@@ -11,7 +11,7 @@ var config = {
   "serverport"    : port,
   "clientport"    : (process.env.OPENSHIFT_NODEJS_PORT) ? '8000':'8080',
   "protocol"      :   'ws://',
-  "heartbeattmo": 1000, // milliseconds 
+  "heartbeattmo"  : 1000, // milliseconds 
   
   "wsclientopts": { reconnection: true, 
                     reconnectionDelay: 2000,
@@ -59,7 +59,20 @@ app.get('/api/config', function(req, res) {
 *
 **/
 
+
+function sendHeartbeat()
+{
+    console.log("autoping") ; 
+    setTimeout(sendHeartbeat, 5000);
+    io.sockets.emit('ping', { beat : 1 });
+}
+
 io.sockets.on('connection', function(client) {
+
+    client.on('pong', function(data)
+    {
+        console.log("Pong received from client");
+    });
 
     client.emit("status", "Now, we are connected to server");
 
@@ -151,3 +164,5 @@ io.sockets.on('connection', function(client) {
         redisClient.quit();
     });
 });
+
+setTimeout(sendHeartbeat, 8000);
