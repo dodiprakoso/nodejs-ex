@@ -3,6 +3,7 @@ var express = require('express'),
     fs      = require('fs'),
     app     = express(),
     eps     = require('ejs'),
+    redis   = require('redis'),
     morgan  = require('morgan');
     
 Object.assign=require('object-assign')
