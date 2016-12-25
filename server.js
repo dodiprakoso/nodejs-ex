@@ -1,3 +1,20 @@
+//  OpenShift sample Node application
+var express = require('express'),
+    fs      = require('fs'),
+    app     = express(),
+    eps     = require('ejs'),
+    morgan  = require('morgan');
+
+var server = require('http').Server(app);
+var config = require('./config');
+const redis =   require('redis');
+const io =      require('socket.io').listen(server);
+const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.redislabs.com',{});
+
+client.auth("silahkanmasuk123"); 
+
+
+
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -6,7 +23,7 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 
 
 
-var config = {
+var Config = {
   // Contents of this file will be send to the client
   "domain"        :     process.env.OPENSHIFT_APP_DNS || '127.0.0.1',
   "serverip"      :   ip,
@@ -23,24 +40,17 @@ var config = {
 };
 
 
-// Express.js stuff
-var express = require('express');
-var app = require('express')();
-var server = require('http').Server(app);
+/*app.engine('html', require('ejs').renderFile);
+app.get('/', function (req, res) {
+    res.render('index.html', { pageCountMessage : null});
+});*/
 
-// Websockets with socket.io
+server.listen(port,ip,function() {
 
-const redis =   require('redis');
-const io =      require('socket.io').listen(server);
-const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.redislabs.com',{});
-
-client.auth("silahkanmasuk123"); 
-
-server.listen(config.serverport,config.serverip,function() {
-
-  console.log("Server running @ http://" + config.serverip + ":" + config.serverport);
+  console.log("Server running @ http://" + ip + ":" + port);
 
 });
+
 
  // Allow some files to be server over HTTP
 app.use(express.static(__dirname + '/'));
@@ -153,3 +163,4 @@ io.sockets.on('connection', function(client) {
         redisClient.quit();
     });
 });
+
