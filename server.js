@@ -1,15 +1,13 @@
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
-    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
-    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-    mongoURLLabel = "";
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
 
 
 
 var config = {
   // Contents of this file will be send to the client
-  "domain"        :     process.env.OPENSHIFT_APP_DNS || '127.0.0.1',
-  "serverip"      :   ip,
+  "domain"        : process.env.OPENSHIFT_APP_DNS || '127.0.0.1',
+  "serverip"      : ip,
   "serverport"    : port,
   "clientport"    : (process.env.OPENSHIFT_NODEJS_PORT) ? '8000':'8080',
   "protocol"      :   'ws://',
@@ -102,7 +100,7 @@ io.sockets.on('connection', function(client) {
     });
 
     client.on('send message', function(data) {
-        console.log('sending room post', data.room);
+        console.log('sending room post', data.message);
         client.broadcast.to(data.room).emit('conversation private post', data.message);
     });
 
