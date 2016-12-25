@@ -62,8 +62,8 @@ app.get('/api/config', function(req, res) {
 
 function sendHeartbeat()
 {
-    console.log("autoping") ; 
-    setTimeout(sendHeartbeat, 5000);
+    //console.log("autoping") ; 
+    setTimeout(sendHeartbeat, 1000);
     io.sockets.emit('ping', { beat : 1 });
 }
 
@@ -113,7 +113,7 @@ io.sockets.on('connection', function(client) {
     });
 
     client.on('send message', function(data) {
-        console.log('sending room post', data.message);
+        console.log('sending room post', data.room);
         client.broadcast.to(data.room).emit('conversation private post', data.message);
     });
 
