@@ -26,9 +26,10 @@ app.get('/', function (req, res) {
     res.render('index.html', { pageCountMessage : null});
 });
 
+server.listen(port,ip,function() {
+
+  console.log("Server running @ http://" + config.serverip + ":" + config.serverport);
+
+});
 
 
-app.listen(port, ip);
-console.log('Server running on http://%s:%s', ip, port);
-
-module.exports = app ;
