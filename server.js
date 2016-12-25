@@ -4,6 +4,14 @@ var express = require('express'),
     app     = express(),
     eps     = require('ejs'),
     morgan  = require('morgan');
+
+var config = require('./config');
+
+const redis =   require('redis');
+const io =      require('socket.io').listen(server);
+const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.redislabs.com',{});
+
+
     
 Object.assign=require('object-assign')
 
