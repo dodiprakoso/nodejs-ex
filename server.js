@@ -146,8 +146,8 @@ io.sockets.on('connection', function(client) {
     *
     **/
 
-    client.on('disconnect', function() { 
-        console.log('A user disconnected');
+    client.on('disconnect', function(reason) { 
+        console.log('A user disconnected '+reason);
         redisClient.quit();
     });
 });
