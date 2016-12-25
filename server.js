@@ -13,7 +13,11 @@ const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.
 
 client.auth("silahkanmasuk123"); 
 
+server.listen(config.serverport,config.serverip,function() {
 
+  console.log("Server running @ http://" + config.serverip + ":" + config.serverport);
+
+});
 
 
     
