@@ -1,18 +1,12 @@
 //  OpenShift sample Node application
-var fs      = require('fs'),
+var express = require('express'),
+    fs      = require('fs'),
+    app     = express(),
     eps     = require('ejs'),
     morgan  = require('morgan');
 
-var app = require('express')();
 var server = require('http').Server(app);
-
 var config = require('./config');
-
-const redis =   require('redis');
-const io =      require('socket.io').listen(server);
-const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.redislabs.com',{});
-
-
     
 Object.assign=require('object-assign')
 
