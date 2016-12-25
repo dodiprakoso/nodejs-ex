@@ -21,6 +21,25 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
     mongoURLLabel = "";
 
+
+
+var Config = {
+  // Contents of this file will be send to the client
+  "domain"        :     process.env.OPENSHIFT_APP_DNS || '127.0.0.1',
+  "serverip"      :   ip,
+  "serverport"    : port,
+  "clientport"    : (process.env.OPENSHIFT_NODEJS_PORT) ? '8000':'8080',
+  "protocol"      :   'ws://',
+  "heartbeattmo": 1000, // milliseconds 
+  
+  "wsclientopts": { reconnection: true, 
+                    reconnectionDelay: 2000,
+                    reconnectionAttempts: 100,
+                    secure: false
+                  }
+};
+
+
 /*app.engine('html', require('ejs').renderFile);
 app.get('/', function (req, res) {
     res.render('index.html', { pageCountMessage : null});
