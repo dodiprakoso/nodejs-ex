@@ -14,6 +14,9 @@ const client =  redis.createClient(14561, 'redis-14561.c8.us-east-1-3.ec2.cloud.
 client.auth("silahkanmasuk123"); 
 
 
+
+app.engine('html', require('ejs').renderFile);
+
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
