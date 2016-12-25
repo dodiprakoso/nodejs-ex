@@ -6,7 +6,7 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 
 
 
-var Config = {
+var config = {
   // Contents of this file will be send to the client
   "domain"        :     process.env.OPENSHIFT_APP_DNS || '127.0.0.1',
   "serverip"      :   ip,
