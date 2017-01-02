@@ -26,7 +26,7 @@ var express = require('express');
 var app = require('express')();
 var server = require('http').Server(app);
 var bodyParser = require('body-parser');
-
+var jsonParser = bodyParser.json();
 // Websockets with socket.io
 
 const redis =   require('redis');
