@@ -71,11 +71,11 @@ app.post('/facebook', jsonParser , function(req, res)
 {
     console.log('Facebook request body:');
     console.log(req.body);
-    console.log('Facebook res :');
-    console.log(res);
+    /*console.log('Facebook res :');
+    console.log(res);*/
     
     // Process the Facebook updates here
-    io.sockets.emit('user.change', { type:'channel' });
+    //io.sockets.emit('user.change', { type:'channel' });
     //res.redirect('back');
 
     res.send(200);
