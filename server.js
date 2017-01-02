@@ -68,10 +68,30 @@ app.get('/facebook', function(req, res)
 
 app.post('/facebook', function(req, res) 
 {
-  console.log('Facebook request body:');
-  console.log(req.body);
-  // Process the Facebook updates here
-  res.send(200);
+    console.log('Facebook request body:');
+    console.log(req.body);
+    console.log('Facebook res :');
+    console.log(req.body);
+    // Process the Facebook updates here
+    io.sockets.on('connection', function(client) 
+    {
+        client.subscribe('user.change');
+
+        client.on("message", function(channel, data) 
+        {
+
+            data = JSON.parse(data);
+
+            if(data.user){      
+
+                io.sockets.in(data.user.user_permalink).emit(channel, data);
+
+            }        
+
+        });
+    });
+
+    res.send(200);
 });
 /**
 * On Connection
