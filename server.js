@@ -54,6 +54,25 @@ app.get('/api/config', function(req, res) {
   res.send('var config = ' + JSON.stringify(config));
 }); 
 
+
+//facebook hook 
+app.get('/facebook', function(req, res) 
+{
+  if (req.param('hub.mode') == 'subscribe' && req.param('hub.verify_token') == 'keepBeingYou') 
+  {
+    res.send(req.param('hub.challenge'));
+  } else {
+    res.send(400);
+  }
+}); 
+
+app.post('/facebook', function(req, res) 
+{
+  console.log('Facebook request body:');
+  console.log(req.body);
+  // Process the Facebook updates here
+  res.send(200);
+});
 /**
 * On Connection
 *
