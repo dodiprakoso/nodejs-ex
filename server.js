@@ -71,14 +71,25 @@ app.post('/facebook', function(req, res)
     console.log('Facebook request body:');
     console.log(req.body);
     console.log('Facebook res :');
-    console.log(req.body);
+    console.log(res);
     
     // Process the Facebook updates here
-    
+    io.sockets.emit('user.change', { type:'channel' });
+    res.redirect('back');
+
     res.send(200);
 });
+
+
 /**
 * On Connection
+
+app.post('/', function(req, res){
+  console.log(req.body);
+  io.sockets.emit('my other event', req.body);
+  res.redirect('back');
+});
+
 *
 **/
 
