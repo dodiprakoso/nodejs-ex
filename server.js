@@ -25,6 +25,7 @@ var config = {
 var express = require('express');
 var app = require('express')();
 var server = require('http').Server(app);
+var bodyParser = require('body-parser');
 
 // Websockets with socket.io
 
@@ -66,7 +67,7 @@ app.get('/facebook', function(req, res)
   }
 }); 
 
-app.post('/facebook', function(req, res) 
+app.post('/facebook', jsonParser , function(req, res) 
 {
     console.log('Facebook request body:');
     console.log(req.body);
@@ -75,7 +76,7 @@ app.post('/facebook', function(req, res)
     
     // Process the Facebook updates here
     io.sockets.emit('user.change', { type:'channel' });
-    res.redirect('back');
+    //res.redirect('back');
 
     res.send(200);
 });
