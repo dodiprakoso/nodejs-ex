@@ -56,6 +56,7 @@ app.get('/api/config', function(req, res) {
 }); 
 
 
+/* ################ ni data langsung di parse di server ####################### */
 //facebook hook 
 app.get('/facebook', function(req, res) 
 {
@@ -75,9 +76,9 @@ app.post('/facebook', jsonParser , function(req, res)
     console.log(res);*/
     
     // Process the Facebook updates here
-    //io.sockets.emit('user.change', { type:'channel' });
-    //res.redirect('back');
-
+    io.sockets.emit('user.change', { type:'channel' });
+    console.log("user.change trigered");
+    
     res.send(200);
 });
 
