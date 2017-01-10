@@ -71,14 +71,14 @@ app.get('/facebook', function(req, res)
 app.post('/facebook', jsonParser , function(req, res) 
 {
     console.log('Facebook request body:');
-    console.log(req.body);
+    console.log(req.body.entry[0].messaging[0].message.text);
     /*console.log('Facebook res :');
     console.log(res);*/
     
     // Process the Facebook updates here
-    io.sockets.emit('user.change', { type:'channel' });
-    console.log("user.change trigered");
-    
+    //io.sockets.emit('user.change', { type:'channel' });
+    //console.log("user.change trigered");
+
     res.send(200);
 });
 
